@@ -40,11 +40,12 @@ val SharedSettings = Seq(
 )
 
 lazy val root = project.in(file("."))
-  .aggregate(js, jvm, upickle.js, upickle.jvm)
+  .aggregate(js, jvm, native, upickle.js, upickle.jvm, upickle.native)
   .settings(SharedSettings: _*)
   .settings(publishArtifact := false)
 
-lazy val metaRx = crossProject(JSPlatform, JVMPlatform)
+lazy val metaRx = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+  .withoutSuffixFor(JVMPlatform)
   .in(file("."))
   .settings(SharedSettings: _*)
   .settings(sonatypeSettings: _*)
@@ -64,7 +65,8 @@ lazy val metaRx = crossProject(JSPlatform, JVMPlatform)
       "org.scalatest" %% "scalatest" % Dependencies.ScalaTest % "test"
   )
 
-lazy val upickle = crossProject(JSPlatform, JVMPlatform)
+lazy val upickle = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+  .withoutSuffixFor(JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("upickle"))
   .settings(SharedSettings: _*)
@@ -85,9 +87,11 @@ lazy val upickle = crossProject(JSPlatform, JVMPlatform)
 
 lazy val js = metaRx.js
 lazy val jvm = metaRx.jvm
+lazy val native = metaRx.native
 
 lazy val upickleJS = upickle.js
 lazy val upickleJVM = upickle.jvm
+lazy val upickleNative = upickle.native
 
 lazy val manual = project.in(file("manual"))
   .dependsOn(jvm, upickleJVM)
